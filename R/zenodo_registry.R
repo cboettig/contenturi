@@ -38,3 +38,23 @@ retrieve_zenodo <- function(id, host = "https://zenodo.org"){
 ## rather beyond the scope of a small `contentid` package.
 
 
+## Citation returns all matching DOIs that contain the content
+
+cite_zenodo <- function(deid, host = "https://zenodo.org"){
+  query <- "/api/records/?q=_files.checksum:"
+  hash <- strip_prefix(id)
+  algo <- extract_algo(id)
+  checksum <- paste0('"', algo, ":", hash, '"')
+  url <- paste0(host, query, checksum)
+  resp <- httr::GET(url)
+  sources <- httr::content(resp)
+  if(length(sources) == 0){
+    NULL  
+  }
+  doi <- vapply(sources, `[[`, character(1L), "doi_url")
+  ## see $metadata$journal_*, $metadata$creator, $publication_date
+  
+  doi
+  ## 
+  
+}
